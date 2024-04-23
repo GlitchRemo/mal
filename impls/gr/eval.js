@@ -1,6 +1,22 @@
 const { Env } = require("./env");
 const { MalSymbol, MalList, MalNumber, MalVector } = require("./types");
 
+const handleLet = (args, oldEnv) => {
+  const env = new Env(oldEnv);
+  const bindings = args[0].value;
+
+  for (let i = 0; i < bindings.length; i += 2) {
+    env.set(bindings[i].value, EVAL(bindings[i + 1], env));
+  }
+
+  return EVAL(args[1], env);
+};
+
+const handleDef = (args, env) => {
+  env.set(args[0].value, EVAL(args[1], env));
+  return env.get(args[0].value);
+};
+
 const eval_ast = (ast, env) => {
   if (ast instanceof MalSymbol) return env.get(ast.value);
 
@@ -15,17 +31,6 @@ const eval_ast = (ast, env) => {
   return ast;
 };
 
-const handleLet = (args, oldEnv) => {
-  const env = new Env(oldEnv);
-  const bindings = args[0].value;
-
-  for (let i = 0; i < bindings.length; i += 2) {
-    env.set(bindings[i].value, EVAL(bindings[i + 1], env));
-  }
-
-  return EVAL(args[1], env);
-};
-
 const EVAL = (ast, env) => {
   if (ast.value.length === 0) return ast;
 
@@ -34,7 +39,7 @@ const EVAL = (ast, env) => {
 
     switch (symbol.value) {
       case "def!":
-        return env.set(args[0].value, EVAL(args[1], env));
+        return handleDef(args, env);
 
       case "let*":
         return handleLet(args, env);

@@ -11,7 +11,6 @@ class Env {
 
   set(key, value) {
     this.#data[key] = value;
-    return value;
   }
 
   find(key) {
