@@ -1,13 +1,12 @@
 const { Env } = require("./env");
 const { MalSymbol, MalList, MalNumber, MalVector, MalMap } = require("./types");
+const { chunk } = require("./utils");
 
 const handleLet = (args, oldEnv) => {
   const env = new Env(oldEnv);
   const bindings = args[0].value;
 
-  for (let i = 0; i < bindings.length; i += 2) {
-    env.set(bindings[i].value, EVAL(bindings[i + 1], env));
-  }
+  chunk(bindings, 2).forEach(([k, v]) => env.set(k.value, EVAL(v, env)));
 
   return EVAL(args[1], env);
 };
