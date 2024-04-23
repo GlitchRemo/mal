@@ -14,7 +14,7 @@ class MalSymbol extends MalType {
   }
 
   pr_str() {
-    return this.value.toString();
+    return super.pr_str().toString();
   }
 }
 
@@ -36,7 +36,7 @@ class MalBoolean extends MalType {
   }
 
   pr_str() {
-    return this.value.toString();
+    return super.pr_str().toString();
   }
 }
 
@@ -66,11 +66,12 @@ class MalString extends MalType {
   }
 
   pr_str() {
-    return this.value.trim();
+    return super.pr_str().trim();
   }
 }
 
 module.exports = {
+  MalType,
   MalNumber,
   MalList,
   MalVector,

@@ -38,7 +38,7 @@ const tokenize = (string) => {
 const read_atom = (reader) => {
   const token = reader.next();
 
-  if (token.match(/^\d$/)) return new MalNumber(parseInt(token));
+  if (token.match(/^[-|+]?\d+$/)) return new MalNumber(parseInt(token));
 
   if (token.match(/^".*"$/)) return new MalString(token);
 

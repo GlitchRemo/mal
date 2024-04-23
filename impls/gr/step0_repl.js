@@ -10,8 +10,8 @@ const PRINT = (str) => str;
 const rep = (str) => PRINT(EVAL(READ(str)));
 
 const repl = () => {
-  rl.question("user> ", (answer) => {
-    console.log(rep(answer));
+  rl.question("user> ", (strExpr) => {
+    console.log(rep(strExpr));
     repl();
   });
 };
