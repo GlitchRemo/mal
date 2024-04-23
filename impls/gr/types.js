@@ -1,73 +1,72 @@
-class MalSymbol {
-  #value;
+class MalType {
+  value;
   constructor(value) {
-    this.#value = value;
+    this.value = value;
   }
 
   pr_str() {
-    return this.#value.toString();
+    return this.value;
   }
 }
-
-class MalNumber {
-  #value;
+class MalSymbol extends MalType {
   constructor(value) {
-    this.#value = value;
+    super(value);
   }
 
   pr_str() {
-    return this.#value;
+    return this.value.toString();
   }
 }
 
-class MalNil {
+class MalNumber extends MalType {
+  constructor(value) {
+    super(value);
+  }
+}
+
+class MalNil extends MalType {
   pr_str() {
     return "nil";
   }
 }
 
-class MalBoolean {
-  #value;
+class MalBoolean extends MalType {
   constructor(value) {
-    this.#value = value;
+    super(value);
   }
 
   pr_str() {
-    return this.#value;
+    return this.value.toString();
   }
 }
 
-class MalList {
-  #value;
-
+class MalList extends MalType {
   constructor(value) {
-    this.#value = value;
+    super(value);
   }
 
   pr_str() {
-    return `(${this.#value.map((e) => e.pr_str()).join(" ")})`;
+    return `(${this.value.map((e) => e.pr_str()).join(" ")})`;
   }
 }
 
-class MalVector {
-  #value;
+class MalVector extends MalType {
   constructor(value) {
-    this.#value = value;
+    super(value);
   }
 
   pr_str() {
-    return `[${this.#value.map((e) => e.pr_str()).join(" ")}]`;
+    return `[${this.value.map((e) => e.pr_str()).join(" ")}]`;
   }
 }
 
-class MalString {
-  #value;
+class MalString extends MalType {
   constructor(value) {
-    this.#value = value;
+    super(value);
   }
 
   pr_str() {
-    return this.#value.trim();
+    return this.value.trim();
   }
 }
 

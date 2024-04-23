@@ -38,13 +38,15 @@ const tokenize = (string) => {
 const read_atom = (reader) => {
   const token = reader.next();
 
-  if (token.match(/^\d$/)) return new MalNumber(token);
+  if (token.match(/^\d$/)) return new MalNumber(parseInt(token));
 
   if (token.match(/^".*"$/)) return new MalString(token);
 
   if (token[0] === '"') throw new Error("unbalanced");
 
-  if (token === "true" || token === "false") return new MalBoolean(token);
+  if (token === "true") return new MalBoolean(true);
+
+  if (token === "false") return new MalBoolean(false);
 
   if (token === "nil") return new MalNil();
 
