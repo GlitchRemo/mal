@@ -29,7 +29,7 @@ const eval_ast = (ast, env) => {
     return new MalVector(ast.value.map((e) => EVAL(e, env)));
 
   if (ast instanceof MalMap)
-    return new MalMap(ast.value.map((e) => EVAL(e, env)));
+    return new MalMap(ast.value.map(([k, v]) => [k, EVAL(v, env)]));
 
   return ast;
 };

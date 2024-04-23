@@ -2,23 +2,23 @@ const readline = require("node:readline");
 const { read_str } = require("./reader");
 const { stdin: input, stdout: output } = require("node:process");
 const { EVAL } = require("./eval");
-const { MalNumber } = require("./types");
+const { MalNumber, MalNil } = require("./types");
 const { pr_str } = require("./printer");
+const { Env } = require("./env");
 
 const rl = readline.createInterface({ input, output });
 
-const env = {
-  "+": (a, b) => new MalNumber(a + b),
-  "-": (a, b) => new MalNumber(a - b),
-  "*": (a, b) => new MalNumber(a * b),
-  "/": (a, b) => new MalNumber(a / b),
-};
+const repl_env = new Env(new MalNil());
+repl_env.set("+", (a, b) => new MalNumber(a + b));
+repl_env.set("-", (a, b) => new MalNumber(a - b));
+repl_env.set("*", (a, b) => new MalNumber(a * b));
+repl_env.set("/", (a, b) => new MalNumber(a / b));
 
 const READ = (str) => read_str(str);
 
 const PRINT = (str) => pr_str(str);
 
-const rep = (str) => PRINT(EVAL(READ(str), env));
+const rep = (str) => PRINT(EVAL(READ(str), repl_env));
 
 const repl = () => {
   rl.question("user> ", (strExpr) => {
@@ -27,6 +27,7 @@ const repl = () => {
     } catch (err) {
       console.log(err);
     }
+
     repl();
   });
 };
