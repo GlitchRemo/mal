@@ -60,6 +60,18 @@ class MalVector extends MalType {
   }
 }
 
+class MalMap extends MalType {
+  constructor(value) {
+    super(value);
+  }
+
+  pr_str() {
+    return `{${this.value
+      .map(([k, v]) => k.pr_str() + " " + v.pr_str())
+      .join(" ")}}`;
+  }
+}
+
 class MalString extends MalType {
   constructor(value) {
     super(value);
@@ -79,4 +91,5 @@ module.exports = {
   MalNil,
   MalBoolean,
   MalSymbol,
+  MalMap,
 };

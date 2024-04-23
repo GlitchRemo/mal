@@ -6,7 +6,9 @@ const {
   MalBoolean,
   MalNil,
   MalSymbol,
+  MalMap,
 } = require("./types");
+const { chunk } = require("./utils");
 
 class Reader {
   #tokens;
@@ -70,6 +72,13 @@ const read_list = (reader) => new MalList(read_seq(reader, ")"));
 
 const read_vector = (reader) => new MalVector(read_seq(reader, "]"));
 
+const read_map = (reader) => {
+  const ast = read_seq(reader, "}");
+  const chunkedAst = chunk(ast, 2);
+
+  return new MalMap(chunkedAst);
+};
+
 const read_form = (reader) => {
   const token = reader.peek();
 
@@ -81,6 +90,10 @@ const read_form = (reader) => {
     case "[":
       reader.next();
       return read_vector(reader);
+
+    case "{":
+      reader.next();
+      return read_map(reader);
 
     default:
       return read_atom(reader);

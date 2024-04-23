@@ -1,5 +1,5 @@
 const { Env } = require("./env");
-const { MalSymbol, MalList, MalNumber, MalVector } = require("./types");
+const { MalSymbol, MalList, MalNumber, MalVector, MalMap } = require("./types");
 
 const handleLet = (args, oldEnv) => {
   const env = new Env(oldEnv);
@@ -27,6 +27,9 @@ const eval_ast = (ast, env) => {
 
   if (ast instanceof MalVector)
     return new MalVector(ast.value.map((e) => EVAL(e, env)));
+
+  if (ast instanceof MalMap)
+    return new MalMap(ast.value.map((e) => EVAL(e, env)));
 
   return ast;
 };
