@@ -11,12 +11,11 @@ class Env {
     this.#binds = binds;
     this.#exprs = exprs;
     this.#data = {};
-    // this.#bind_exprs();
   }
 
-  #bind_exprs() {
-    this.#binds.forEach((e, i) => {
-      this.set(e, this.#exprs[i]);
+  bind_exprs() {
+    this.#binds.value.forEach((e, i) => {
+      this.set(e.value, this.#exprs[i]);
     });
   }
 

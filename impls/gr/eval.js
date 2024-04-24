@@ -7,6 +7,7 @@ const {
   MalMap,
   MalNil,
   MalBoolean,
+  MalFunction,
 } = require("./types");
 const { chunk } = require("./utils");
 
@@ -38,6 +39,8 @@ const eval_ast = (ast, env) => {
   if (ast instanceof MalMap)
     return new MalMap(ast.value.map(([k, v]) => [k, EVAL(v, env)]));
 
+  if (ast instanceof MalFunction) return ast.value;
+
   return ast;
 };
 
@@ -54,6 +57,19 @@ const handleIf = (args, env) => {
     : otherwise
     ? EVAL(otherwise, env)
     : new MalNil();
+};
+
+const handleFn = (args, env) => {
+  const [bindings, body] = args;
+
+  const fnClosure = (...params) => {
+    const newEnv = new Env({ outer: env, binds: bindings, exprs: params });
+    newEnv.bind_exprs();
+
+    return EVAL(body, newEnv);
+  };
+
+  return new MalFunction(fnClosure);
 };
 
 const EVAL = (ast, env) => {
@@ -76,13 +92,13 @@ const EVAL = (ast, env) => {
       case "if":
         return handleIf(args, env);
 
+      case "fn*":
+        return handleFn(args, env);
+
       default: {
         const [fn, ...args] = eval_ast(ast, env).value;
 
-        return fn.apply(
-          null,
-          args.map((e) => e.value)
-        );
+        return fn.value.apply(null, args);
       }
     }
   }

@@ -2,17 +2,28 @@ const readline = require("node:readline");
 const { read_str } = require("./reader");
 const { stdin: input, stdout: output } = require("node:process");
 const { EVAL } = require("./eval");
-const { MalNumber, MalNil } = require("./types");
+const { MalNumber, MalNil, MalBoolean, MalFunction } = require("./types");
 const { pr_str } = require("./printer");
 const { Env } = require("./env");
 
 const rl = readline.createInterface({ input, output });
 
-const repl_env = new Env(new MalNil());
-repl_env.set("+", (a, b) => new MalNumber(a + b));
-repl_env.set("-", (a, b) => new MalNumber(a - b));
-repl_env.set("*", (a, b) => new MalNumber(a * b));
-repl_env.set("/", (a, b) => new MalNumber(a / b));
+const handlers = {
+  "+": (a, b) => new MalNumber(a.value + b.value),
+  "-": (a, b) => new MalNumber(a.value - b.value),
+  "*": (a, b) => new MalNumber(a.value * b.value),
+  "/": (a, b) => new MalNumber(a.value / b.value),
+  ">": (a, b) => new MalBoolean(a.value > b.value),
+  "<": (a, b) => new MalBoolean(a.value < b.value),
+  "<=": (a, b) => new MalBoolean(a.value <= b.value),
+  ">=": (a, b) => new MalBoolean(a.value >= b.value),
+};
+
+const repl_env = new Env({ outer: new MalNil() });
+
+Object.entries(handlers).map(([symbol, handler]) =>
+  repl_env.set(symbol, new MalFunction(handler))
+);
 
 const READ = (str) => read_str(str);
 

@@ -86,6 +86,16 @@ class MalString extends MalType {
   }
 }
 
+class MalFunction extends MalType {
+  constructor(value) {
+    super(value);
+  }
+
+  pr_str() {
+    return "#<function>";
+  }
+}
+
 module.exports = {
   MalType,
   MalNumber,
@@ -96,4 +106,5 @@ module.exports = {
   MalBoolean,
   MalSymbol,
   MalMap,
+  MalFunction,
 };
