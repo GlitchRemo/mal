@@ -25,6 +25,10 @@ class MalNumber extends MalType {
 }
 
 class MalNil extends MalType {
+  constructor() {
+    super(false);
+  }
+
   pr_str() {
     return "nil";
   }

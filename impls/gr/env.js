@@ -2,11 +2,22 @@ const { MalNil } = require("./types");
 
 class Env {
   #outer;
+  #binds;
+  #exprs;
   #data;
 
-  constructor(outer) {
+  constructor({ outer, binds, exprs }) {
     this.#outer = outer;
+    this.#binds = binds;
+    this.#exprs = exprs;
     this.#data = {};
+    // this.#bind_exprs();
+  }
+
+  #bind_exprs() {
+    this.#binds.forEach((e, i) => {
+      this.set(e, this.#exprs[i]);
+    });
   }
 
   set(key, value) {

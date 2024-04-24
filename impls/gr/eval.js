@@ -6,11 +6,12 @@ const {
   MalVector,
   MalMap,
   MalNil,
+  MalBoolean,
 } = require("./types");
 const { chunk } = require("./utils");
 
 const handleLet = (args, oldEnv) => {
-  const env = new Env(oldEnv);
+  const env = new Env({ outer: oldEnv });
   const [bindings, body] = args;
 
   chunk(bindings.value, 2).forEach(([k, v]) => env.set(k.value, EVAL(v, env)));
@@ -40,6 +41,21 @@ const eval_ast = (ast, env) => {
   return ast;
 };
 
+const handleDo = (args, env) => {
+  const evaluatedList = eval_ast(new MalList(args), env);
+  return evaluatedList.value.at(-1);
+};
+
+const handleIf = (args, env) => {
+  const [condition, then, otherwise] = args;
+
+  return EVAL(condition, env).value
+    ? EVAL(then, env)
+    : otherwise
+    ? EVAL(otherwise, env)
+    : new MalNil();
+};
+
 const EVAL = (ast, env) => {
   if (ast.value.length === 0) return ast;
 
@@ -52,6 +68,13 @@ const EVAL = (ast, env) => {
 
       case "let*":
         return handleLet(args, env);
+
+      case "do":
+      case "DO":
+        return handleDo(args, env);
+
+      case "if":
+        return handleIf(args, env);
 
       default: {
         const [fn, ...args] = eval_ast(ast, env).value;
