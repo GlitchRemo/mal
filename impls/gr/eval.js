@@ -1,14 +1,21 @@
 const { Env } = require("./env");
-const { MalSymbol, MalList, MalNumber, MalVector, MalMap } = require("./types");
+const {
+  MalSymbol,
+  MalList,
+  MalNumber,
+  MalVector,
+  MalMap,
+  MalNil,
+} = require("./types");
 const { chunk } = require("./utils");
 
 const handleLet = (args, oldEnv) => {
   const env = new Env(oldEnv);
-  const bindings = args[0].value;
+  const [bindings, body] = args;
 
-  chunk(bindings, 2).forEach(([k, v]) => env.set(k.value, EVAL(v, env)));
+  chunk(bindings.value, 2).forEach(([k, v]) => env.set(k.value, EVAL(v, env)));
 
-  return EVAL(args[1], env);
+  return body ? EVAL(body, env) : new MalNil();
 };
 
 const handleDef = (args, env) => {
@@ -48,6 +55,7 @@ const EVAL = (ast, env) => {
 
       default: {
         const [fn, ...args] = eval_ast(ast, env).value;
+
         return fn.apply(
           null,
           args.map((e) => e.value)

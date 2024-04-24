@@ -14,7 +14,7 @@ class Env {
   }
 
   find(key) {
-    if (this.#data[key]) return this.#data[key];
+    if (this.#data[key]) return this;
 
     return this.#outer instanceof MalNil ? new MalNil() : this.#outer.find(key);
   }
@@ -22,7 +22,7 @@ class Env {
   get(key) {
     if (this.find(key) instanceof MalNil) throw new Error(`${key} not found`);
 
-    return this.find(key);
+    return this.find(key).#data[key];
   }
 }
 
