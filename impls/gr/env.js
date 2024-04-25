@@ -1,4 +1,4 @@
-const { MalNil } = require("./types");
+const { MalNil, MalVector } = require("./types");
 
 class Env {
   #outer;
@@ -15,9 +15,14 @@ class Env {
   }
 
   #bind_exprs() {
-    this.#binds.forEach((e, i) => {
-      this.set(e.value, this.#exprs[i]);
-    });
+    for (let i = 0; i < this.#binds.length; i++) {
+      if (this.#binds[i].value === "&") {
+        this.set(this.#binds[i + 1].value, new MalVector(this.#exprs.slice(i)));
+        return;
+      }
+
+      this.set(this.#binds[i].value, this.#exprs[i]);
+    }
   }
 
   set(key, value) {

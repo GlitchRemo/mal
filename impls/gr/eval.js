@@ -1,3 +1,4 @@
+const { log } = require("console");
 const { Env } = require("./env");
 const {
   MalSymbol,
@@ -40,9 +41,13 @@ const handleIf = (args, env) => {
 };
 
 const handleFn = (args, env) => {
-  const [bindings, body] = args;
+  const [bindings, ...body] = args;
 
-  return new MalFunction({ bindings, body, env });
+  return new MalFunction({
+    bindings,
+    body: new MalList([new MalSymbol("do"), ...body]),
+    env,
+  });
 };
 
 const eval_ast = (ast, env) => {
