@@ -1,3 +1,6 @@
+const isEnclosure = (value) =>
+  value instanceof MalList || value instanceof MalVector;
+
 class MalType {
   value;
   constructor(value) {
@@ -6,6 +9,10 @@ class MalType {
 
   pr_str() {
     return this.value;
+  }
+
+  equals(other) {
+    return this.value === other.value;
   }
 }
 class MalSymbol extends MalType {
@@ -52,6 +59,13 @@ class MalList extends MalType {
   pr_str() {
     return `(${this.value.map((e) => e.pr_str()).join(" ")})`;
   }
+
+  equals(other) {
+    return (
+      this.value.length === other.value.length &&
+      this.value.every((e, i) => e.equals(other.value[i]))
+    );
+  }
 }
 
 class MalVector extends MalType {
@@ -61,6 +75,13 @@ class MalVector extends MalType {
 
   pr_str() {
     return `[${this.value.map((e) => e.pr_str()).join(" ")}]`;
+  }
+
+  equals(other) {
+    return (
+      this.value.length === other.value.length &&
+      this.value.every((e, i) => e.equals(other.value[i]))
+    );
   }
 }
 
@@ -73,6 +94,16 @@ class MalMap extends MalType {
     return `{${this.value
       .map(([k, v]) => k.pr_str() + " " + v.pr_str())
       .join(" ")}}`;
+  }
+
+  equals(other) {
+    return (
+      this.value.length === other.value.length &&
+      this.value.every(
+        ([k, v], i) =>
+          k.equals(other.value[i][0]) && v.equals(other.value[i][1])
+      )
+    );
   }
 }
 
@@ -107,4 +138,5 @@ module.exports = {
   MalSymbol,
   MalMap,
   MalFunction,
+  isEnclosure,
 };

@@ -14,7 +14,7 @@ class Env {
   }
 
   bind_exprs() {
-    this.#binds.value.forEach((e, i) => {
+    this.#binds.forEach((e, i) => {
       this.set(e.value, this.#exprs[i]);
     });
   }

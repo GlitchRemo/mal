@@ -6,24 +6,9 @@ const {
   MalVector,
   MalMap,
   MalNil,
-  MalBoolean,
   MalFunction,
 } = require("./types");
 const { chunk } = require("./utils");
-
-const handleLet = (args, oldEnv) => {
-  const env = new Env({ outer: oldEnv });
-  const [bindings, body] = args;
-
-  chunk(bindings.value, 2).forEach(([k, v]) => env.set(k.value, EVAL(v, env)));
-
-  return body ? EVAL(body, env) : new MalNil();
-};
-
-const handleDef = (args, env) => {
-  env.set(args[0].value, EVAL(args[1], env));
-  return env.get(args[0].value);
-};
 
 const eval_ast = (ast, env) => {
   if (ast instanceof MalSymbol) return env.get(ast.value);
@@ -44,9 +29,23 @@ const eval_ast = (ast, env) => {
   return ast;
 };
 
+const handleDef = (args, env) => {
+  env.set(args[0].value, EVAL(args[1], env));
+  return env.get(args[0].value);
+};
+
 const handleDo = (args, env) => {
   const evaluatedList = eval_ast(new MalList(args), env);
   return evaluatedList.value.at(-1);
+};
+
+const handleLet = (args, oldEnv) => {
+  const env = new Env({ outer: oldEnv });
+  const [bindings, ...body] = args;
+
+  chunk(bindings.value, 2).forEach(([k, v]) => env.set(k.value, EVAL(v, env)));
+
+  return body ? handleDo(body, env) : new MalNil();
 };
 
 const handleIf = (args, env) => {
@@ -60,13 +59,18 @@ const handleIf = (args, env) => {
 };
 
 const handleFn = (args, env) => {
-  const [bindings, body] = args;
+  const [bindings, ...body] = args;
 
   const fnClosure = (...params) => {
-    const newEnv = new Env({ outer: env, binds: bindings, exprs: params });
+    const newEnv = new Env({
+      outer: env,
+      binds: bindings.value,
+      exprs: params,
+    });
+
     newEnv.bind_exprs();
 
-    return EVAL(body, newEnv);
+    return handleDo(body, newEnv);
   };
 
   return new MalFunction(fnClosure);
@@ -97,7 +101,6 @@ const EVAL = (ast, env) => {
 
       default: {
         const [fn, ...args] = eval_ast(ast, env).value;
-
         return fn.value.apply(null, args);
       }
     }
