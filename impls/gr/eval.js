@@ -10,25 +10,6 @@ const {
 } = require("./types");
 const { chunk } = require("./utils");
 
-const eval_ast = (ast, env) => {
-  if (ast instanceof MalSymbol) return env.get(ast.value);
-
-  if (ast instanceof MalNumber) return new MalNumber(ast.value);
-
-  if (ast instanceof MalList)
-    return new MalList(ast.value.map((e) => EVAL(e, env)));
-
-  if (ast instanceof MalVector)
-    return new MalVector(ast.value.map((e) => EVAL(e, env)));
-
-  if (ast instanceof MalMap)
-    return new MalMap(ast.value.map(([k, v]) => [k, EVAL(v, env)]));
-
-  if (ast instanceof MalFunction) return ast.value;
-
-  return ast;
-};
-
 const handleDef = (args, env) => {
   env.set(args[0].value, EVAL(args[1], env));
   return env.get(args[0].value);
@@ -50,63 +31,85 @@ const handleLet = (args, oldEnv) => {
 
 const handleIf = (args, env) => {
   const [condition, then, otherwise] = args;
+  const evaluatedCondition = EVAL(condition, env);
 
-  return EVAL(condition, env).value === false
+  return evaluatedCondition instanceof MalNil ||
+    evaluatedCondition.value === false
     ? otherwise
-      ? EVAL(otherwise, env)
-      : new MalNil()
-    : EVAL(then, env);
+    : then;
 };
 
 const handleFn = (args, env) => {
-  const [bindings, ...body] = args;
+  const [bindings, body] = args;
 
-  const fnClosure = (...params) => {
-    const newEnv = new Env({
-      outer: env,
-      binds: bindings.value,
-      exprs: params,
-    });
+  return new MalFunction({ bindings, body, env });
+};
 
-    newEnv.bind_exprs();
+const eval_ast = (ast, env) => {
+  if (ast instanceof MalSymbol) return env.get(ast.value);
 
-    return handleDo(body, newEnv);
-  };
+  if (ast instanceof MalNumber) return new MalNumber(ast.value);
 
-  return new MalFunction(fnClosure);
+  if (ast instanceof MalList)
+    return new MalList(ast.value.map((e) => EVAL(e, env)));
+
+  if (ast instanceof MalVector)
+    return new MalVector(ast.value.map((e) => EVAL(e, env)));
+
+  if (ast instanceof MalMap)
+    return new MalMap(ast.value.map(([k, v]) => [k, EVAL(v, env)]));
+
+  if (ast instanceof MalFunction) return ast.value;
+
+  return ast;
 };
 
 const EVAL = (ast, env) => {
-  if (ast.value.length === 0) return ast;
+  while (true) {
+    if (ast.value?.length === 0) return ast;
 
-  if (ast instanceof MalList) {
-    const [symbol, ...args] = ast.value;
+    if (ast instanceof MalList) {
+      const [symbol, ...args] = ast.value;
 
-    switch (symbol.value) {
-      case "def!":
-        return handleDef(args, env);
+      switch (symbol.value) {
+        case "def!":
+          return handleDef(args, env);
 
-      case "let*":
-        return handleLet(args, env);
+        case "let*":
+          return handleLet(args, env);
 
-      case "do":
-      case "DO":
-        return handleDo(args, env);
+        case "do":
+        case "DO":
+          return handleDo(args, env);
 
-      case "if":
-        return handleIf(args, env);
+        case "if":
+          ast = handleIf(args, env);
+          continue;
 
-      case "fn*":
-        return handleFn(args, env);
+        case "fn*":
+          return handleFn(args, env);
 
-      default: {
-        const [fn, ...args] = eval_ast(ast, env).value;
-        return fn.value.apply(null, args);
+        default: {
+          const [fn, ...args] = eval_ast(ast, env).value;
+
+          if (fn instanceof MalFunction) {
+            env = new Env({
+              outer: env,
+              binds: fn.bindings.value,
+              exprs: args,
+            });
+            env.bind_exprs();
+            ast = fn.body;
+            continue;
+          }
+
+          return fn.apply(null, args);
+        }
       }
     }
-  }
 
-  return eval_ast(ast, env);
+    return eval_ast(ast, env);
+  }
 };
 
 module.exports = { eval_ast, EVAL };

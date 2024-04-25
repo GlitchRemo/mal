@@ -5,7 +5,6 @@ const {
   MalFunction,
   MalNil,
   MalList,
-  isEnclosure,
 } = require("./types");
 
 const ns = {
@@ -19,9 +18,9 @@ const ns = {
   ">=": (a, b) => new MalBoolean(a.value >= b.value),
   "=": (a, b) => new MalBoolean(a.equals(b)),
   list: (...args) => new MalList(args),
-  "list?": (...args) => args[0] instanceof MalList,
-  "empty?": (...args) => isEnclosure(args[0]) && !args[0].value.length,
-  count: (...args) => isEnclosure(args[0]) && args[0].value.length,
+  "list?": (...args) => new MalBoolean(args[0] instanceof MalList),
+  "empty?": (...args) => new MalBoolean(args[0].value.length === 0),
+  count: (...args) => new MalBoolean(args[0].value.length),
   prn: (...args) => {
     console.log(args.map((e) => e.pr_str()).join(" "));
     return new MalNil();
@@ -32,7 +31,7 @@ const create_and_load_env = () => {
   const repl_env = new Env({ outer: new MalNil() });
 
   Object.entries(ns).map(([symbol, handler]) =>
-    repl_env.set(symbol, new MalFunction(handler))
+    repl_env.set(symbol, handler)
   );
 
   return repl_env;

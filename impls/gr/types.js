@@ -1,6 +1,3 @@
-const isEnclosure = (value) =>
-  value instanceof MalList || value instanceof MalVector;
-
 class MalType {
   value;
   constructor(value) {
@@ -118,8 +115,15 @@ class MalString extends MalType {
 }
 
 class MalFunction extends MalType {
-  constructor(value) {
-    super(value);
+  bindings;
+  body;
+  env;
+
+  constructor({ bindings, body, env }) {
+    super();
+    this.bindings = bindings;
+    this.body = body;
+    this.env = env;
   }
 
   pr_str() {
@@ -138,5 +142,4 @@ module.exports = {
   MalSymbol,
   MalMap,
   MalFunction,
-  isEnclosure,
 };
