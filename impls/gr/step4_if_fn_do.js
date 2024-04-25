@@ -3,7 +3,7 @@ const { read_str } = require("./reader");
 const { stdin: input, stdout: output } = require("node:process");
 const { EVAL } = require("./eval");
 const { pr_str } = require("./printer");
-const { create_global_env } = require("./core");
+const { create_and_load_env } = require("./core");
 
 const rl = readline.createInterface({ input, output });
 
@@ -11,7 +11,7 @@ const READ = (str) => read_str(str);
 
 const PRINT = (str) => pr_str(str);
 
-const env = create_global_env();
+const env = create_and_load_env();
 
 const rep = (str) => PRINT(EVAL(READ(str), env));
 rep("(def! not (fn* (a) (if a false true)))");

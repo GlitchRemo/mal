@@ -28,7 +28,7 @@ const ns = {
   },
 };
 
-const create_global_env = () => {
+const create_and_load_env = () => {
   const repl_env = new Env({ outer: new MalNil() });
 
   Object.entries(ns).map(([symbol, handler]) =>
@@ -38,4 +38,4 @@ const create_global_env = () => {
   return repl_env;
 };
 
-module.exports = { create_global_env };
+module.exports = { create_and_load_env };
