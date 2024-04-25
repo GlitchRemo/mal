@@ -18,9 +18,9 @@ const ns = {
   ">=": (a, b) => new MalBoolean(a.value >= b.value),
   "=": (a, b) => new MalBoolean(a.equals(b)),
   list: (...args) => new MalList(args),
-  "list?": (...args) => new MalBoolean(args[0] instanceof MalList),
-  "empty?": (...args) => new MalBoolean(args[0].value.length === 0),
-  count: (...args) => new MalNumber(args[0].value.length),
+  "list?": (arg) => new MalBoolean(arg instanceof MalList),
+  "empty?": (arg) => new MalBoolean(arg.value.length === 0),
+  count: (arg) => (arg instanceof MalNil ? 0 : new MalNumber(arg.value.length)),
   prn: (...args) => {
     console.log(args.map((e) => e.pr_str()).join(" "));
     return new MalNil();

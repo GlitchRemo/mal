@@ -1,4 +1,3 @@
-const { log } = require("console");
 const { Env } = require("./env");
 const {
   MalSymbol,
@@ -11,6 +10,8 @@ const {
 } = require("./types");
 const { chunk } = require("./utils");
 
+const wrapInDo = (...body) => new MalList([new MalSymbol("do"), ...body]);
+
 const handleDef = (args, env) => {
   env.set(args[0].value, EVAL(args[1], env));
   return env.get(args[0].value);
@@ -21,13 +22,12 @@ const handleDo = (args, env) => {
   return args.at(-1);
 };
 
-const handleLet = (args, oldEnv) => {
+const handleLet = (bindings, oldEnv) => {
   const env = new Env({ outer: oldEnv });
-  const [bindings, ...body] = args;
 
   chunk(bindings.value, 2).forEach(([k, v]) => env.set(k.value, EVAL(v, env)));
 
-  return body ? handleDo(body, env) : new MalNil();
+  return env;
 };
 
 const handleIf = (args, env) => {
@@ -45,7 +45,7 @@ const handleFn = (args, env) => {
 
   return new MalFunction({
     bindings,
-    body: new MalList([new MalSymbol("do"), ...body]),
+    body: wrapInDo(...body),
     env,
   });
 };
@@ -80,8 +80,12 @@ const EVAL = (ast, env) => {
         case "def!":
           return handleDef(args, env);
 
-        case "let*":
-          return handleLet(args, env);
+        case "let*": {
+          const [bindings, ...body] = args;
+          env = handleLet(bindings, env);
+          ast = wrapInDo(...body);
+          continue;
+        }
 
         case "do":
         case "DO":
