@@ -100,7 +100,7 @@ const EVAL = (ast, env) => {
 
           if (fn instanceof MalFunction) {
             env = new Env({
-              outer: env,
+              outer: fn.env,
               binds: fn.bindings.value,
               exprs: args,
             });
