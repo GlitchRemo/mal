@@ -98,12 +98,12 @@ const EVAL = (ast, env) => {
               binds: fn.bindings.value,
               exprs: args,
             });
-            env.bind_exprs();
+
             ast = fn.body;
             continue;
           }
 
-          return fn.apply(null, args);
+          return fn(...args);
         }
       }
     }
