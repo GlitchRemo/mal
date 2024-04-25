@@ -12,21 +12,37 @@ class MalType {
     return this.value === other.value;
   }
 }
-class MalSymbol extends MalType {
-  constructor(value) {
-    super(value);
+
+class MalEnclosure extends MalType {
+  pr_str(opening_symbol, closing_symbol) {
+    return (
+      opening_symbol +
+      this.value.map((e) => e.pr_str()).join(" ") +
+      closing_symbol
+    );
   }
 
+  equals(other) {
+    return (
+      this.value.length === other.value.length &&
+      this.value.every((e, i) => e.equals(other.value[i]))
+    );
+  }
+}
+
+class MalSymbol extends MalType {
   pr_str() {
     return super.pr_str().toString();
   }
 }
 
-class MalNumber extends MalType {
-  constructor(value) {
-    super(value);
+class MalKeyword extends MalType {
+  pr_str() {
+    return `:${this.value}`;
   }
 }
+
+class MalNumber extends MalType {}
 
 class MalNil extends MalType {
   constructor() {
@@ -39,54 +55,24 @@ class MalNil extends MalType {
 }
 
 class MalBoolean extends MalType {
-  constructor(value) {
-    super(value);
-  }
-
   pr_str() {
     return super.pr_str().toString();
   }
 }
 
-class MalList extends MalType {
-  constructor(value) {
-    super(value);
-  }
-
+class MalList extends MalEnclosure {
   pr_str() {
-    return `(${this.value.map((e) => e.pr_str()).join(" ")})`;
-  }
-
-  equals(other) {
-    return (
-      this.value.length === other.value.length &&
-      this.value.every((e, i) => e.equals(other.value[i]))
-    );
+    return super.pr_str("(", ")");
   }
 }
 
-class MalVector extends MalType {
-  constructor(value) {
-    super(value);
-  }
-
+class MalVector extends MalEnclosure {
   pr_str() {
-    return `[${this.value.map((e) => e.pr_str()).join(" ")}]`;
-  }
-
-  equals(other) {
-    return (
-      this.value.length === other.value.length &&
-      this.value.every((e, i) => e.equals(other.value[i]))
-    );
+    return super.pr_str("[", "]");
   }
 }
 
 class MalMap extends MalType {
-  constructor(value) {
-    super(value);
-  }
-
   pr_str() {
     return `{${this.value
       .map(([k, v]) => k.pr_str() + " " + v.pr_str())
@@ -105,10 +91,6 @@ class MalMap extends MalType {
 }
 
 class MalString extends MalType {
-  constructor(value) {
-    super(value);
-  }
-
   pr_str() {
     return super.pr_str().trim();
   }
@@ -142,4 +124,5 @@ module.exports = {
   MalSymbol,
   MalMap,
   MalFunction,
+  MalKeyword,
 };

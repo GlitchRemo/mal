@@ -17,8 +17,8 @@ const handleDef = (args, env) => {
 };
 
 const handleDo = (args, env) => {
-  const evaluatedList = eval_ast(new MalList(args), env);
-  return evaluatedList.value.at(-1);
+  eval_ast(new MalList(args.slice(0, -1)), env);
+  return args.at(-1);
 };
 
 const handleLet = (args, oldEnv) => {
@@ -85,7 +85,8 @@ const EVAL = (ast, env) => {
 
         case "do":
         case "DO":
-          return handleDo(args, env);
+          ast = handleDo(args, env);
+          continue;
 
         case "if":
           ast = handleIf(args, env);

@@ -7,6 +7,7 @@ const {
   MalNil,
   MalSymbol,
   MalMap,
+  MalKeyword,
 } = require("./types");
 const { chunk } = require("./utils");
 
@@ -51,6 +52,8 @@ const read_atom = (reader) => {
   if (token === "false") return new MalBoolean(false);
 
   if (token === "nil") return new MalNil();
+
+  if (token[0] === ":") return new MalKeyword(token.slice(1));
 
   return new MalSymbol(token);
 };
