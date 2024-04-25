@@ -12,7 +12,9 @@ const READ = (str) => read_str(str);
 const PRINT = (str) => pr_str(str);
 
 const env = create_global_env();
+
 const rep = (str) => PRINT(EVAL(READ(str), env));
+rep("(def! not (fn* (a) (if a false true)))");
 
 const repl = () => {
   rl.question("user> ", (strExpr) => {

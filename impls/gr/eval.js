@@ -51,11 +51,11 @@ const handleLet = (args, oldEnv) => {
 const handleIf = (args, env) => {
   const [condition, then, otherwise] = args;
 
-  return EVAL(condition, env).value
-    ? EVAL(then, env)
-    : otherwise
-    ? EVAL(otherwise, env)
-    : new MalNil();
+  return EVAL(condition, env).value === false
+    ? otherwise
+      ? EVAL(otherwise, env)
+      : new MalNil()
+    : EVAL(then, env);
 };
 
 const handleFn = (args, env) => {
