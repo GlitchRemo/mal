@@ -20,7 +20,7 @@ const ns = {
   list: (...args) => new MalList(args),
   "list?": (...args) => new MalBoolean(args[0] instanceof MalList),
   "empty?": (...args) => new MalBoolean(args[0].value.length === 0),
-  count: (...args) => new MalBoolean(args[0].value.length),
+  count: (...args) => new MalNumber(args[0].value.length),
   prn: (...args) => {
     console.log(args.map((e) => e.pr_str()).join(" "));
     return new MalNil();
@@ -30,9 +30,7 @@ const ns = {
 const create_and_load_env = () => {
   const repl_env = new Env({ outer: new MalNil() });
 
-  Object.entries(ns).map(([symbol, handler]) =>
-    repl_env.set(symbol, handler)
-  );
+  Object.entries(ns).map(([symbol, handler]) => repl_env.set(symbol, handler));
 
   return repl_env;
 };

@@ -31,7 +31,7 @@ const handleLet = (args, oldEnv) => {
 };
 
 const handleIf = (args, env) => {
-  const [condition, then, otherwise] = args;
+  const [condition, then, otherwise = new MalNil()] = args;
   const evaluatedCondition = EVAL(condition, env);
 
   return evaluatedCondition instanceof MalNil ||
