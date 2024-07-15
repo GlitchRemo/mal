@@ -17,7 +17,7 @@ class MalEnclosure extends MalType {
   pr_str(opening_symbol, closing_symbol) {
     return (
       opening_symbol +
-      this.value.map((e) => e.pr_str()).join(" ") +
+      this.value.map((e) => (e instanceof MalType ? e.pr_str() : e)).join(" ") +
       closing_symbol
     );
   }

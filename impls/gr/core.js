@@ -1,10 +1,12 @@
 const { Env } = require("./env");
+const fs = require("fs");
+const { read_str } = require("./reader");
 const {
   MalNumber,
   MalBoolean,
-  MalFunction,
   MalNil,
   MalList,
+  MalString,
 } = require("./types");
 
 const ns = {
@@ -25,6 +27,10 @@ const ns = {
     console.log(args.map((e) => e.pr_str()).join(" "));
     return new MalNil();
   },
+  str: (...args) => new MalString(args.map((e) => e.pr_str()).join("")),
+  "read-string": (str) => read_str(str.value),
+  slurp: (fileName) =>
+    new MalString(fs.readFileSync(fileName.value.replaceAll('"', ""), "utf-8")),
 };
 
 const create_and_load_env = () => {
